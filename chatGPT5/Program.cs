@@ -1,12 +1,11 @@
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddControllersWithViews(); // Используйте MVC
+builder.Services.AddControllersWithViews();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigin",
-        builder => builder.WithOrigins("http://localhost:3000") // URL вашего React приложения
+        builder => builder.WithOrigins("http://localhost:3000", "http://localhost:3001")
             .AllowAnyMethod()
             .AllowAnyHeader());
 });
@@ -22,7 +21,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors("AllowSpecificOrigin"); // Включение CORS
+app.UseCors("AllowSpecificOrigin");
 
 app.UseRouting();
 app.UseAuthorization();
