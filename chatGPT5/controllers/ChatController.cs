@@ -9,13 +9,11 @@ public class ChatController : ControllerBase
     {
         return Ok(ChatRepository.Messages);
     }
-
+    
     [HttpPost("send")]
     public ActionResult SendMessage([FromBody] Message message)
     {
         ChatRepository.Messages.Add(message);
         return Ok();
     }
-
-    // Добавьте методы для персональных сообщений по аналогии
 }
