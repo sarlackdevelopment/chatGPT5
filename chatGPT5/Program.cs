@@ -1,6 +1,10 @@
 using chatGPT5.socket;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddDbContext<ChatContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddSwaggerGen();
