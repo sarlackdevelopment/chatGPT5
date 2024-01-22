@@ -1,3 +1,4 @@
+using chatGPT5;
 using chatGPT5.socket;
 using Microsoft.EntityFrameworkCore;
 

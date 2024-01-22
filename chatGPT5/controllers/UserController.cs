@@ -1,19 +1,32 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
-[ApiController]
-[Route("[controller]")]
-public class UserController : ControllerBase
+namespace chatGPT5.controllers
 {
-    [HttpPost("register")]
-    public ActionResult<User> Register([FromBody] User user)
+    [ApiController]
+    [Route("[controller]")]
+    public class UserController : ControllerBase
     {
-        ChatRepository.Users.Add(user);
-        return Ok(user);
-    }
+        private readonly ChatContext _context;
 
-    [HttpGet("users")]
-    public ActionResult<IEnumerable<User>> GetUsers()
-    {
-        return Ok(ChatRepository.Users);
+        public UserController(ChatContext context)
+        {
+            _context = context;
+        }
+
+        [HttpPost("register")]
+        public async Task<ActionResult<User>> Register([FromBody] User user)
+        {
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+            return Ok(user);
+        }
+
+        [HttpGet("users")]
+        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        {
+            var users = await _context.Users.ToListAsync();
+            return Ok(users);
+        }
     }
 }
