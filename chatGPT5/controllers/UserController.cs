@@ -1,5 +1,6 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
+using chatGPT5.models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,10 +24,17 @@ namespace chatGPT5.controllers
             {
                 return BadRequest("User already exists.");
             }
-            
-            // Хеширование пароля перед сохранением
+    
             user.Password = ComputeSha256Hash(user.Password);
             
+            // if (user.UserChatRooms != null)
+            // {
+            //     foreach (var userChatRoom in user.UserChatRooms)
+            //     {
+            //         // Обработка связи с комнатой, например, проверка наличия комнаты в БД
+            //     }
+            // }
+    
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
             return Ok(user);
@@ -52,5 +60,72 @@ namespace chatGPT5.controllers
                 return builder.ToString();
             }
         }
+        
+        [HttpPost("{userId}/joinRoom/{roomId}")]
+        public async Task<IActionResult> JoinRoom(int userId, int roomId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            var room = await _context.ChatRooms.FindAsync(roomId);
+
+            if (user == null || room == null)
+            {
+                return NotFound();
+            }
+
+            // // Проверяем, состоит ли пользователь уже в комнате
+            // if (!user.UserChatRooms.Any(uc => uc.ChatRoomId == roomId))
+            // {
+            //     user.UserChatRooms.Add(new UserChatRoom() { UserId = userId, ChatRoomId = roomId });
+            //     await _context.SaveChangesAsync();
+            // }
+            var userChatRoom = new UserChatRoom { UserId = userId, ChatRoomId = roomId };
+            _context.UserChatRooms.Add(userChatRoom);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+        
+        // [HttpGet("{userId}/rooms")]
+        // public async Task<ActionResult<IEnumerable<ChatRoom>>> GetUserRooms(int userId)
+        // {
+        //     var user = await _context.Users
+        //         .Include(u => u.UserChatRooms)
+        //         .ThenInclude(uc => uc.ChatRoom)
+        //         .FirstOrDefaultAsync(u => u.Id == userId);
+        //
+        //     if (user == null)
+        //     {
+        //         return NotFound();
+        //     }
+        //
+        //     var rooms = user.UserChatRooms.Select(uc => uc.ChatRoom).ToList();
+        //     return Ok(rooms);
+        // }
+        
+        [HttpGet("{userId}/rooms")]
+        public async Task<ActionResult<IEnumerable<ChatRoom>>> GetUserRooms(int userId)
+        {
+            // Проверяем, существует ли пользователь
+            var userExists = await _context.Users.AnyAsync(u => u.Id == userId);
+            if (!userExists)
+            {
+                return NotFound();
+            }
+
+            // Получаем ID комнат, в которых состоит пользователь
+            var roomIds = await _context.UserChatRooms
+                .Where(uc => uc.UserId == userId)
+                .Select(uc => uc.ChatRoomId)
+                .ToListAsync();
+
+            // Получаем комнаты на основе этих ID
+            var rooms = await _context.ChatRooms
+                .Where(r => roomIds.Contains(r.Id))
+                .ToListAsync();
+
+            return Ok(rooms);
+        }
+
+        
     }
 }
