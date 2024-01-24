@@ -1,4 +1,6 @@
 using chatGPT5;
+using chatGPT5.Interfaces;
+using chatGPT5.Repo;
 using chatGPT5.socket;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,6 +21,8 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddSignalR();
+
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 var app = builder.Build();
 
