@@ -1,4 +1,5 @@
 ﻿using chatGPT5.Interfaces;
+using chatGPT5.Utilities;
 using Microsoft.EntityFrameworkCore;
 
 namespace chatGPT5.Repo;
@@ -42,5 +43,17 @@ public class UserRepository : IUserRepository
         {
             throw new Exception("User or room not found");
         }
+    }
+    
+    public async Task<User> AuthenticateAsync(string username, string password)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+
+        if (user == null || user.Password != PasswordHasher.ComputeSha256Hash(password))
+        {
+            return null;
+        }
+
+        return user;
     }
 }

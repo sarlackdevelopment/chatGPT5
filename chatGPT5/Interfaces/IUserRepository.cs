@@ -8,4 +8,5 @@ public interface IUserRepository
     Task AddUserAsync(User user);
     Task<IEnumerable<User>> GetAllUsersAsync();
     Task JoinRoomAsync(int userId, int roomId);
+    Task<User> AuthenticateAsync(string username, string password);
 }

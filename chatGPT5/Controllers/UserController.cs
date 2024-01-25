@@ -1,7 +1,8 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 using chatGPT5.Interfaces;
-using chatGPT5.models;
+using chatGPT5.Models;
+using chatGPT5.Utilities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace chatGPT5.controllers
@@ -11,12 +12,27 @@ namespace chatGPT5.controllers
     public class UserController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
+        private readonly JwtTokenService _jwtTokenService;
 
-        public UserController(IUserRepository userRepository)
+        public UserController(IUserRepository userRepository, JwtTokenService jwtTokenService)
         {
             _userRepository = userRepository;
+            _jwtTokenService = jwtTokenService;
         }
 
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginModel login)
+        {
+            var user = await _userRepository.AuthenticateAsync(login.Username, login.Password);
+            if (user == null)
+            {
+                return Unauthorized("Invalid credentials.");
+            }
+            
+            var token = _jwtTokenService.GenerateToken(user);
+            return Ok(new { token });
+        }
+        
         [HttpPost("register")]
         public async Task<ActionResult<User>> Register([FromBody] User user)
         {
@@ -25,7 +41,7 @@ namespace chatGPT5.controllers
                 return BadRequest("User already exists.");
             }
     
-            user.Password = ComputeSha256Hash(user.Password);
+            user.Password = PasswordHasher.ComputeSha256Hash(user.Password);
     
             await _userRepository.AddUserAsync(user);
             return Ok(user);
@@ -36,21 +52,6 @@ namespace chatGPT5.controllers
         {
             var users = await _userRepository.GetAllUsersAsync();
             return Ok(users);
-        }
-
-        
-        private string ComputeSha256Hash(string rawData)
-        {
-            using (SHA256 sha256Hash = SHA256.Create())
-            {
-                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(rawData));
-                StringBuilder builder = new StringBuilder();
-                for (int i = 0; i < bytes.Length; i++)
-                {
-                    builder.Append(bytes[i].ToString("x2"));
-                }
-                return builder.ToString();
-            }
         }
         
         [HttpPost("{userId}/joinRoom/{roomId}")]
@@ -66,21 +67,5 @@ namespace chatGPT5.controllers
                 return BadRequest(ex.Message);
             }
         }
-
-        
-        // [HttpGet("{userId}/rooms")]
-        // public async Task<ActionResult<IEnumerable<ChatRoom>>> GetUserRooms(int userId)
-        // {
-        //     try
-        //     {
-        //         var rooms = await _userRepository.GetUserRoomsAsync(userId);
-        //         return Ok(rooms);
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         // Обработка ошибок, например, если пользователь не найден
-        //         return BadRequest(ex.Message);
-        //     }
-        // }
     }
 }
