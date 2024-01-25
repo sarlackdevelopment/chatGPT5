@@ -27,4 +27,20 @@ public class UserRepository : IUserRepository
     {
         return await _context.Users.ToListAsync();
     }
+    
+    public async Task JoinRoomAsync(int userId, int roomId)
+    {
+        var user = await _context.Users.FindAsync(userId);
+        var room = await _context.ChatRooms.FindAsync(roomId);
+
+        if (user != null && room != null)
+        {
+            room.Users.Add(user);
+            await _context.SaveChangesAsync();
+        }
+        else
+        {
+            throw new Exception("User or room not found");
+        }
+    }
 }

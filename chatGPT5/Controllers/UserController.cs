@@ -53,20 +53,19 @@ namespace chatGPT5.controllers
             }
         }
         
-        // [HttpPost("{userId}/joinRoom/{roomId}")]
-        // public async Task<IActionResult> JoinRoom(int userId, int roomId)
-        // {
-        //     try
-        //     {
-        //         await _userRepository.JoinRoomAsync(userId, roomId);
-        //         return NoContent();
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         // Обработка ошибок, например, если пользователь или комната не найдены
-        //         return BadRequest(ex.Message);
-        //     }
-        // }
+        [HttpPost("{userId}/joinRoom/{roomId}")]
+        public async Task<IActionResult> JoinRoom(int userId, int roomId)
+        {
+            try
+            {
+                await _userRepository.JoinRoomAsync(userId, roomId);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
         
         // [HttpGet("{userId}/rooms")]
