@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using chatGPT5.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace chatGPT5.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class ChatRoomController : ControllerBase

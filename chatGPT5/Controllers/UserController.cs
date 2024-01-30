@@ -1,8 +1,7 @@
-﻿using System.Security.Cryptography;
-using System.Text;
-using chatGPT5.Interfaces;
+﻿using chatGPT5.Interfaces;
 using chatGPT5.Models;
 using chatGPT5.Utilities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace chatGPT5.controllers
@@ -47,6 +46,7 @@ namespace chatGPT5.controllers
             return Ok(user);
         }
 
+        [Authorize]
         [HttpGet("users")]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
@@ -54,6 +54,7 @@ namespace chatGPT5.controllers
             return Ok(users);
         }
         
+        [Authorize]
         [HttpPost("{userId}/joinRoom/{roomId}")]
         public async Task<IActionResult> JoinRoom(int userId, int roomId)
         {
