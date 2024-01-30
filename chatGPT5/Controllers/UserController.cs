@@ -1,5 +1,7 @@
-﻿using chatGPT5.Interfaces;
+﻿using AutoMapper;
+using chatGPT5.Interfaces;
 using chatGPT5.Models;
+using chatGPT5.Models.dto;
 using chatGPT5.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,11 +14,13 @@ namespace chatGPT5.controllers
     {
         private readonly IUserRepository _userRepository;
         private readonly JwtTokenService _jwtTokenService;
+        private readonly IMapper _mapper;
 
-        public UserController(IUserRepository userRepository, JwtTokenService jwtTokenService)
+        public UserController(IUserRepository userRepository, JwtTokenService jwtTokenService, IMapper mapper)
         {
             _userRepository = userRepository;
             _jwtTokenService = jwtTokenService;
+            _mapper = mapper;
         }
 
         [HttpPost("login")]
@@ -48,10 +52,11 @@ namespace chatGPT5.controllers
 
         [Authorize]
         [HttpGet("users")]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        public async Task<ActionResult<IEnumerable<UserDto>>> GetUsers()
         {
             var users = await _userRepository.GetAllUsersAsync();
-            return Ok(users);
+            var userDtos = _mapper.Map<IEnumerable<UserDto>>(users);
+            return Ok(userDtos);
         }
         
         [Authorize]
