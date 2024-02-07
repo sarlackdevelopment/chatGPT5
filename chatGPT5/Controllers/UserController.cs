@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using chatGPT5.Enums;
 using chatGPT5.Interfaces;
 using chatGPT5.Models;
 using chatGPT5.Models.dto;
@@ -47,7 +48,8 @@ namespace chatGPT5.controllers
             user.Password = PasswordHasher.ComputeSha256Hash(user.Password);
     
             await _userRepository.AddUserAsync(user);
-            return Ok(user);
+            var userDto = _mapper.Map<UserDto>(user);
+            return Ok(userDto);
         }
 
         [Authorize]
@@ -72,6 +74,18 @@ namespace chatGPT5.controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+        
+        [Authorize(Roles = nameof(Roles.Moderator))]
+        [HttpPatch("{userId}/role")]
+        public async Task<IActionResult> UpdateUserRole(int userId, [FromBody] Roles newRole)
+        {
+            var result = await _userRepository.UpdateUserRoleAsync(userId, newRole);
+            if (!result)
+            {
+                return NotFound($"User with ID {userId} not found.");
+            }
+            return NoContent();
         }
     }
 }

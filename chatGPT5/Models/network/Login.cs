@@ -1,4 +1,6 @@
-﻿namespace chatGPT5.Models
+﻿using chatGPT5.Enums;
+
+namespace chatGPT5.Models
 {
     public class LoginModel
     {

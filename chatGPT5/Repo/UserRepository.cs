@@ -1,4 +1,5 @@
-﻿using chatGPT5.Interfaces;
+﻿using chatGPT5.Enums;
+using chatGPT5.Interfaces;
 using chatGPT5.Utilities;
 using Microsoft.EntityFrameworkCore;
 
@@ -56,4 +57,19 @@ public class UserRepository : IUserRepository
 
         return user;
     }
+    
+    public async Task<bool> UpdateUserRoleAsync(int userId, Roles newRole)
+    {
+        var user = await _context.Users.FindAsync(userId);
+        if (user == null)
+        {
+            return false;
+        }
+
+        user.Role = newRole;
+        _context.Users.Update(user);
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
 }
