@@ -1,4 +1,6 @@
-﻿public static class ChatRepository
+﻿using chatGPT5.Models.network;
+
+public static class ChatRepository
 {
     public static List<User> Users = new List<User>
     {

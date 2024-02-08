@@ -1,11 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using chatGPT5.Enums;
+using Microsoft.AspNetCore.Mvc;
 using chatGPT5.Interfaces;
 using chatGPT5.models;
 using Microsoft.AspNetCore.Authorization;
 
 namespace chatGPT5.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class ChatRoomController : ControllerBase
@@ -17,6 +17,7 @@ namespace chatGPT5.Controllers
             _chatRoomRepository = chatRoomRepository;
         }
 
+        [Authorize]
         [HttpGet("{roomId}/users")]
         public async Task<ActionResult<List<User>>> GetUsersByRoom(int roomId)
         {
@@ -24,6 +25,7 @@ namespace chatGPT5.Controllers
             return Ok(users);
         }
         
+        [Authorize(Roles = nameof(Roles.Moderator))]
         [HttpPost("create")]
         public async Task<IActionResult> CreateRoom([FromBody] ChatRoom chatRoom)
         {
@@ -36,6 +38,7 @@ namespace chatGPT5.Controllers
             return CreatedAtAction(nameof(GetRoomById), new { roomId = chatRoom.Id }, chatRoom);
         }
         
+        [Authorize]
         [HttpGet("all")]
         public async Task<ActionResult<List<ChatRoom>>> GetAllRooms()
         {
@@ -43,6 +46,7 @@ namespace chatGPT5.Controllers
             return Ok(rooms);
         }
 
+        [Authorize]
         [HttpGet("{roomId}")]
         public async Task<ActionResult<ChatRoom>> GetRoomById(int roomId)
         {
