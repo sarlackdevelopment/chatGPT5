@@ -34,17 +34,28 @@ namespace chatGPT5.Controllers
                 return BadRequest("Invalid chat room data.");
             }
 
-            await _chatRoomRepository.AddChatRoomAsync(chatRoom);
-            return CreatedAtAction(nameof(GetRoomById), new { roomId = chatRoom.Id }, chatRoom);
+            await _chatRoomRepository.AddChatRoomAsync(chatRoom); 
+            var rooms = await _chatRoomRepository.GetAllChatRoomsAsync();
+            return Ok(rooms);
         }
         
-        [Authorize]
+        [Authorize(Roles = nameof(Roles.Moderator))]
         [HttpGet("all")]
         public async Task<ActionResult<List<ChatRoom>>> GetAllRooms()
         {
             var rooms = await _chatRoomRepository.GetAllChatRoomsAsync();
             return Ok(rooms);
         }
+        
+        [Authorize(Roles = nameof(Roles.Moderator))]
+        [HttpDelete("{roomId}")]
+        public async Task<IActionResult> DeleteRoom(int roomId)
+        {
+            await _chatRoomRepository.DeleteChatRoomAsync(roomId);
+            var rooms = await _chatRoomRepository.GetAllChatRoomsAsync();
+            return Ok(rooms);
+        }
+
 
         [Authorize]
         [HttpGet("{roomId}")]

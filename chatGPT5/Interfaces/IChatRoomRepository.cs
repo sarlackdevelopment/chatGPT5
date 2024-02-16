@@ -8,4 +8,5 @@ public interface IChatRoomRepository
     Task AddChatRoomAsync(ChatRoom chatRoom);
     Task<List<ChatRoom>> GetAllChatRoomsAsync();
     Task<ChatRoom> GetRoomByIdAsync(int roomId);
+    Task<bool> DeleteChatRoomAsync(int roomId);
 }

@@ -61,7 +61,7 @@ namespace chatGPT5.controllers
             return Ok(userDtos);
         }
         
-        [Authorize]
+        [Authorize(Roles = nameof(Roles.Moderator))]
         [HttpPost("{userId}/joinRoom/{roomId}")]
         public async Task<IActionResult> JoinRoom(int userId, int roomId)
         {
@@ -69,6 +69,25 @@ namespace chatGPT5.controllers
             {
                 await _userRepository.JoinRoomAsync(userId, roomId);
                 return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        
+        [Authorize(Roles = nameof(Roles.Moderator))]
+        [HttpPost("{userId}/leaveRoom/{roomId}")]
+        public async Task<IActionResult> LeaveRoom(int userId, int roomId)
+        {
+            try
+            {
+                var result = await _userRepository.LeaveRoomAsync(userId, roomId);
+                if (!result)
+                {
+                    return NotFound($"User with ID {userId} not found in room with ID {roomId}.");
+                }
+                return Ok($"User with ID {userId} successfully left the room with ID {roomId}.");
             }
             catch (Exception ex)
             {

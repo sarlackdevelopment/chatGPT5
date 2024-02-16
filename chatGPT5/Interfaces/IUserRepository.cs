@@ -10,4 +10,5 @@ public interface IUserRepository
     Task JoinRoomAsync(int userId, int roomId);
     Task<User> AuthenticateAsync(string username, string password);
     Task<bool> UpdateUserRoleAsync(int userId, Roles newRole);
+    Task<bool> LeaveRoomAsync(int userId, int roomId);
 }

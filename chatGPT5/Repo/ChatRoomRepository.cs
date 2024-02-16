@@ -39,5 +39,18 @@ public class ChatRoomRepository : IChatRoomRepository
             .FirstOrDefaultAsync(r => r.Id == roomId);
     }
 
+    public async Task<bool> DeleteChatRoomAsync(int roomId)
+    {
+        var room = await _context.ChatRooms.FindAsync(roomId);
+        if (room == null)
+        {
+            return false;
+        }
+
+        _context.ChatRooms.Remove(room);
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
     
 }

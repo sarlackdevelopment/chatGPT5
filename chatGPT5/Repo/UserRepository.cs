@@ -71,5 +71,23 @@ public class UserRepository : IUserRepository
         await _context.SaveChangesAsync();
         return true;
     }
+    
+    public async Task<bool> LeaveRoomAsync(int userId, int roomId)
+    {
+        var user = await _context.Users.FindAsync(userId);
+        var room = await _context.ChatRooms.Include(r => r.Users).FirstOrDefaultAsync(r => r.Id == roomId);
 
+        if (user != null && room != null && room.Users.Contains(user))
+        {
+            room.Users.Remove(user);
+            await _context.SaveChangesAsync();
+        }
+        else
+        {
+            throw new Exception("User or room not found or user is not a member of the room");
+        }
+
+        return true;
+    }
+    
 }
