@@ -1,5 +1,6 @@
 ﻿using chatGPT5.Enums;
 using chatGPT5.Interfaces;
+using chatGPT5.models;
 using chatGPT5.Utilities;
 using Microsoft.EntityFrameworkCore;
 
@@ -88,6 +89,15 @@ public class UserRepository : IUserRepository
         }
 
         return true;
+    }
+    
+    public async Task<List<ChatRoom>> GetUserRoomsAsync(int userId)
+    {
+        var userWithRooms = await _context.Users
+            .Include(u => u.ChatRooms)
+            .FirstOrDefaultAsync(u => u.Id == userId);
+
+        return userWithRooms?.ChatRooms ?? new List<ChatRoom>();
     }
     
 }

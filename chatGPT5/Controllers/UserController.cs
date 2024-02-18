@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using chatGPT5.Enums;
 using chatGPT5.Interfaces;
+using chatGPT5.models;
 using chatGPT5.Models;
 using chatGPT5.Models.dto;
 using chatGPT5.Utilities;
@@ -34,7 +35,7 @@ namespace chatGPT5.controllers
             }
             
             var token = _jwtTokenService.GenerateToken(user);
-            return Ok(new { token });
+            return Ok(new { token, userId = user.Id });
         }
         
         [HttpPost("register")]
@@ -105,6 +106,19 @@ namespace chatGPT5.controllers
                 return NotFound($"User with ID {userId} not found.");
             }
             return NoContent();
+        }
+        
+        [HttpGet("{userId}/rooms")]
+        public async Task<ActionResult<IEnumerable<ChatRoom>>> GetUserRooms(int userId)
+        {
+            var rooms = await _userRepository.GetUserRoomsAsync(userId);
+
+            if (rooms == null || !rooms.Any())
+            {
+                return NotFound($"No rooms found for user with ID {userId}.");
+            }
+
+            return Ok(rooms);
         }
     }
 }

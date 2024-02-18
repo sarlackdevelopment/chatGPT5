@@ -83,7 +83,7 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigin",
-        builder => builder.WithOrigins("http://localhost:3000", "http://localhost:3001")
+        builder => builder.WithOrigins("http://localhost:8080", "http://localhost:8081")
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials());
